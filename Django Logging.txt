@@ -1,0 +1,34 @@
+Django Logging
+
+
+Application Logger Hierarchy
+
+root
+	-django
+		server			-> django.server
+		db.backends		-> django.db.backends
+		requests		-> django.requests
+
+	-wagtail
+	-strip
+	-lessons
+		views			-> lessons.views
+		models			-> lessons.models
+
+
+
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'handlers':{
+		'lessons_file': {
+			'class': 'logging.FileHandler',
+			'filename': 'lessons.debug.log',
+		}
+	},
+	'loggers':{
+		'handlers': ['lessons_file'],
+		'level': 'DEBUG',
+	}
+}
+

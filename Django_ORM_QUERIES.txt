@@ -1,0 +1,29 @@
+ORM QUERIES
+
+This returns the first 5 objects (LIMIT 5):
+>>> Entry.objects.all()[:5]
+
+This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
+>>> Entry.objects.all()[5:10]
+
+FILTER
+__lte - less then equal to
+__gte - greater then equal to
+
+>>> Student.objects.filter(id__gte = 15)
+>>> Entry.objects.filter(category__lte = 'vacation')
+>>> Entry.objects.filter(blog_id=4)
+
+EXACT
+>>> Entry.objects.get(headline = "vacation")
+
+>>> Entry.objects.get(headline__contains='Lennon')
+
+from django.db.models import Avg, Max, Min, Sum, Count
+>>> Student.objects.all().aggregate(Avg('id'))
+
+>>> Student.objects.all().aggregate(Min('id'))
+
+>>> Student.objects.all().aggregate(Max('id'))
+
+>>> Student.objects.all().aggregate(Sum('id'))

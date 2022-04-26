@@ -1,0 +1,12 @@
+Node js
+
+npm init -y
+npm i express mongoose ejs
+npm i --save-dev nodemon
+
+"scripts": {
+    "devStart": "nodemon server.js"
+  },
+
+
+To start server - npm run devStart

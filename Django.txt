@@ -1,0 +1,71 @@
+Django
+
+pip install virtualenv
+python -m venv venv
+venv\Scripts\activate
+pip install Django==3.2.11
+pip install djangorestframework
+django-admin startproject py_wallet
+cd py_wallet
+python manage.py startapp account
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+root
+
+root
+root
+y
+code .
+
+To deactivate
+cd <virtual_env_name>\Scripts\
+deactivate
+--------------------------------------
+Models.py
+
+class Employee(models.Model):  
+    eid = models.CharField(max_length=20)  
+    ename = models.CharField(max_length=100)  
+    econtact = models.CharField(max_length=15)  
+    class Meta:  
+        db_table = "employee"
+
+--------------------------------------
+
+File Upload
+  
+<form method="POST" class="post-form" enctype="multipart/form-data">  
+    {% csrf_token %}  
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>  
+</form>  
+
+
+--------------------------------------
+Migrations
+
+python manage.py makemigrations
+python manage.py migrate
+pyhton manage.py sqlmigrate
+python manage.py showmigrations
+python manage.py showmigrations myapp
+python manage.py sqlmigrate <app_name> 0001
+
+
+--------------------------------------
+Admin Page
+
+from django.contrib import admin
+from django.contrib.auth.models import Group
+from .models import Snippet
+
+admin.site.site_header = 'Admin Header'
+
+class SnippetAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created')
+    list_filter = ('created')
+
+admin.site.unregister(Group)
+admin.site.register(Snippet,SnippetAdmin)

@@ -1,0 +1,233 @@
+Django Middleware
+
+Function based middleware
+A middleware factory is a callable that takes a get_response callable and return a middleware.
+A middleware is a callable that takes a request and returns a response, just like a view.
+
+def my_middleware(get_response):
+	# One-time configuration and initialization.
+	def my_function(request):
+
+		# Code to be executed for each request before the view are called.
+		
+		response = get_response(request)
+		
+		# Code to be executed for each request/response after the view is called.
+		
+		return response
+	return my_function
+
+get_response() - The get_response callable provided by Django might be the actual view(if this is laste listed middleware) or it might be the next middleware in the chain.
+
+
+Class Based Middleware
+
+class MyMiddleware:
+	def __init__(self,get_response):
+		self.get_response = get_response
+		# One-time configuration and initialization
+
+	def __call__(self, request):
+		# code to be executed for each request before the view (and later middleware) are called.
+		response = self.get_response(request)
+		#Code to be executed for each request/response after the view is called.
+
+		return response
+
+
+Activating Middleware
+
+To activate a middleware component, add it to the MIDDLEWARE list in your Django settings.
+
+MIDDLEWARE = [
+	...,
+	'<app_name>.<middlewares.py file>.<function/class name>'
+	'blog.middlewares.my_middleware'
+]
+
+'middlewares.py'
+
+# Function based middleware
+def my_middleware(get_response):
+	print("One Time Initialization")
+	def my_function(request):
+		print("This is before view")
+		response = get_response(request)
+		print("This is after view")
+		return response
+	return my_function
+
+# Class based middleware
+class MyMiddleware:
+	def __init__(self,get_response):
+		self.get_response = get_response
+		print("One Time Initialization")
+
+	def __call__(self, request):
+		print("This is before view")
+		response = self.get_response(request)
+		print("This is after view")
+
+		return response
+
+
+
+#Structure of a basic middleware
+
+class ExampleMiddleware:
+    def _init_(self, get_response):
+        self.get_response = get_response
+
+    def _call_(self, request):
+        # Code that is executed in each request before the view is called
+        response = self.get_response(request)
+
+        # Code that is executed in each request after the view is called
+        return response
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        # This code is executed just before the view is called
+
+    def process_exception(self, request, exception):
+        # This code is executed if an exception is raised
+
+    def process_template_response(self, request, response):
+        # This code is executed if the response contains a render() method
+        return response
+
+
+1. #Keep a record of the number of requests handled and exceptions raised by the server
+class CountRequestsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.count_requests = 0
+        self.count_exceptions = 0
+
+    def __call__(self, request, *args, **kwargs):
+        self.count_requests += 1
+        logger.info(f"Handled {self.count_requests} requests so far")
+        return self.get_response(request)
+
+    def process_exception(self, request, exception):
+        self.count_exceptions += 1
+        logger.error(f"Encountered {self.count_exceptions} exceptions so far")
+
+
+2. #filter out requests from certain unsupported user agents
+class BlockMobileMiddleware:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request, *args, **kwargs):
+        if request.user_agent.is_mobile:
+            return HttpResponse("Mobile devices are not supported", status=400)
+        return self.get_response(request)
+
+
+
+3. #Detect and inject the user agent information into the request
+class SetUserAgentMiddleware:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request, *args, **kwargs):
+        request.user_agent = user_agents.parse(request.META["HTTP_USER_AGENT"])
+        return self.get_response(request)
+
+
+
+
+### Multiple Middleware Example
+
+'middlewares.py'
+
+class BrotherMiddleware:
+	def __init__(self,get_response):
+		self.get_response = get_response
+		print("One Time Brother Initialization")
+
+	def __call__(self, request):
+		print("This is Brother before view")
+		response = self.get_response(request)
+		print("This is Brother after view")
+
+		return response
+
+
+class FatherMiddleware:
+	def __init__(self,get_response):
+		self.get_response = get_response
+		print("One Time Father Initialization")
+
+	def __call__(self, request):
+		print("This is Father before view")
+		response = self.get_response(request)
+		# response = HttpResponse("Back") --> If we want to send response from Father middleware
+		print("This is Father after view")
+
+		return response
+
+class MummyMiddleware:
+	def __init__(self,get_response):
+		self.get_response = get_response
+		print("One Time Mummy Initialization")
+
+	def __call__(self, request):
+		print("This is Mummy before view")
+		response = self.get_response(request)
+		print("This is Mummy after view")
+
+		return response
+
+
+'setting.py'
+
+MIDDLEWARE = [
+	...,
+	'blog.middlewares.BrotherMiddleware',
+	'blog.middlewares.FatherMiddleware',
+	'blog.middlewares.MummyMiddleware'
+]
+
+'view.py'
+def home_view(request):
+    print("Home Page")
+    return HttpResponse("<h1>Home Page</h1>")
+
+
+op:-
+One Time Mummy Initialization
+One Time Father Initialization
+One Time Brother Initialization
+This is Brother before view
+This is Father before view
+This is Mummy before view
+Home Page
+This is Mummy after view
+This is Father after view
+This is Brother after view
+
+
+## Middleware Hooks
+
+Following are special methods to class-based middleware
+- process_view(request, view_func, view_args, view_kwargs) - It is called just before Django calls the view.
+- process_exception(request, exception) - Django calls process_exception() when a view raises an exception.
+- process_template_response(request, response) - This method is called just after the view has finished executing. if the response instance has a render() method, indicating that it is a `TemplateResponse` or equivalent.
+
+
+'middleware.py'
+
+class MyProcessMiddleware:
+	def __init__(self, get_response):
+		self.get_response = get_response
+	def __call__(self, request):
+		response = self.get_response(request)
+		return response
+	def process_view(request, *args, **kwargs):
+		print("This is Process View - Before view")
+		return HttpResponse("This is before view")
+
+

@@ -1,0 +1,89 @@
+Django REST Framework
+
+pip install djangorestframework
+
+INSTALLED_APPS = [
+	...
+	'rest_framework',
+]
+
+Create 'serializers.py' file every app
+Create 'api_url.py' file every app
+
+'serializers.py'
+
+from rest_framework import serializers
+from django.contrib.auth.models import User
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = User
+		fields = (
+			'id'
+			'first_name',
+			'last_name',
+			'email',
+			'url'      --> a part of HyperlinkedModelSerializer
+		)
+
+		--------- OR ------------
+
+class UserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = '__all__'
+
+
+
+'urls.py'
+path('api/v1/', include('users.api_urls')),
+
+
+'api_urls.py'
+from django.urls import path
+from user.views import *
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register('', UserViewSet)
+
+urlpatterns = [
+	path('user/',include(router.urls)),
+]
+
+  
+'views.py'
+
+from rest_framework import viewsets
+from users.serializers import UserSerializer
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from rest_framework.parsers import JSONParser
+from django.views.decorators.csrf import csrf_exempt
+
+class UserViewSet(viewsets.ModelViewSet):
+	queryset = users.objects.all()
+	serializer_class = UserSerializer
+
+
+
+Function base view
+@csrf_exempt
+	def poll(request):
+		if request.method == "GET":
+			questions = Question.objects.all()
+			serializer = QuestionSerializer(questions, many=True)
+			return JSONParser(serializer.data, safe=False)
+
+		if request.method == "POST":
+			 data = JsonParser.parser(request.POST)
+			 serializer = QuestionSerializer(data=data)
+			 if serializer.is_valid():
+			 	serializer.save()
+			 	return JSONParser(serializer.data, status=201)
+			 return JsonResponse(serializer.error, status=400)
+
+
+https://www.django-rest-framework.org/api-guide/views/
+https://stackoverflow.com/questions/35520592/django-custom-permissions-for-function-based-views
+https://www.django-rest-framework.org/api-guide/permissions/
+https://micropyramid.com/blog/generic-functional-based-and-class-based-views-in-django-rest-framework/

@@ -1,0 +1,21 @@
+Django Model Relationship
+
+- One to One Relationship
+- Many to One Relationship
+- Many to Many Relationship
+
+One to One Relationship
+
+When one row of table A can be linked to one row of table B
+
+Syntax:- OneToOneField(to, on_delete, parent_link=False,**options)
+
+
+from django.contrib.auth.models import User
+class Page(model.Model):
+	user = models.OneToOneFields(User, on_delete=model.CASCADE, primary_key=True)
+	page_name = models.CharFeilds(max_length=70)
+	page_cat = models.CharFeilds(max_length=70)
+	page_publish_date = models.DateFields()
+	
+

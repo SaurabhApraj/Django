@@ -1,0 +1,132 @@
+Django Signals
+
+- Login and logout Signals
+- Model Signals
+- Management Signals
+- Request/Response Signals
+- Test Signals
+- Database Signals
+
+Sender - Who will send signal
+Signal - Signal
+Receiver - Who will receive signal
+
+
+Receiver Function - This function takes a sender argument, along with wildcard keywords arguments (**kwargs); all signal handlers must take these arguments. A receiver can be any Python function/method.
+
+def receiver_func(sender, request, user, **kwargs)
+
+Connecting/Registering Receiver Function - There are two ways you can connect a signal:-
+
+- Manual Connect Route
+	Signal.connect(receiver_func, sender = None, weak = True, dispatch_uid = None)
+
+	receiver_func - The callback functio which will be connected to signal.
+	
+	sender - Specifies a particular sender to receiver signals form.
+	
+	weak - Django stores signal handlers as weak references by default. Thus, if your receiver is a local function, it may be garbage collected. To prevent this, pass weak = False when you call the signal's connect() method.
+	
+	dispatch_uid - A unique identifier for a signal receiver in cases where duplicate signals may be sent.
+
+- Decorator
+	@receiver(signal or list of signal, sender)
+
+
+Build-in Signals
+-------------------
+
+Login and Logout Signals - The auth framework uses the following signals that can be used for notifiaction when a user logs in or out.
+
+django.contrib.auth.signals
+user_logged_in(sender, request, user) - Sent when a user logs in successfully.
+sender - The class of the user that just logged in.
+request - The current HttpRequest instance.
+user - The user instance that just logged in.
+
+user_logged_out(sender, request, user) - Sent when the logout method is called.
+sender - The class of the user that just logged out or None if the user was not authenticated.
+request - The current HttpRequest instance.
+user - The user instance that just logged out or None if the user was not authenticated.
+
+user_login_failed(sender, credentials, request) - Sent when the user failed to login successfully.
+
+sender - The name of the module used for authentication.
+credentials - A dictionary of keyword arguments containing the user credentials that were passed to authenticate() or your own custom authentication backed. Credentials matching a set of 'sensitive' patterns, (including password) will not be sent in the clear as part of the signal.
+
+request - The HttpRequest object, if one was provided to authenticate()
+
+
+
+'signals.py'
+
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.contrib.auth.models import User
+
+from django.dispatch import receiver
+
+@receiver(user_logged_in, sender = User)
+def login_success(sender, request, user, **kwargs):
+	print("----------------------")
+	print("Logged-in Signal...")
+	print("Sender", sender)
+	print("Request", request)
+	print("User", user)
+	print("User Password", user.password)
+	print(f'Kwargs: {kwargs}')
+
+	# user_logged_in.connect(login_success, sender = User)
+
+
+@receiver(user_logged_out, sender = User)
+def log_out(sender, request, user, **kwargs):
+	print("----------------------")
+	print("Logged-out Signal...")
+	print("Sender", sender)
+	print("Request", request)
+	print("User", user)
+	print(f'Kwargs: {kwargs}')
+
+	# user_logged_out.connect(log_out, sender = User)
+
+
+@receiver(user_login_failed)
+def login_failed(sender, credentials, request, **kwargs):
+	print("----------------------")
+	print("Login Failed Signal...")
+	print("Sender", sender)
+	print("Credentials", credentials)
+	print("Request", request)
+	print(f'Kwargs: {kwargs}')
+
+	# user_login_failed.connect(login_failed)
+
+
+'apps.py'
+
+from django.apps import AppConfig
+
+class BlogConfig(AppConfig):
+	name = 'blog'
+
+	def ready(self):
+		import blog.signals
+
+
+'__init__.py'
+
+default_app_config = 'blog.apps.BlogConfig'
+
+
+Model signals - A set of signals sent by the model syatem.
+
+django.db.models.signals
+pre_init(sender, args, kwargs) - Whenever you instantiate a Django model, this signal is sent at the beginning of the model's __init__() method.
+sender - The model class that just had an instance created.
+args - A list of positional arguments passed to __init__().
+kwargs - A dictionary of keyword arguments passed to __init__().
+
+post_init(sender, instance) - 
+
+
+

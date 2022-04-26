@@ -1,0 +1,99 @@
+Django Celery
+
+What is Celery?
+
+- Celery is a task queue for executing work outside a Python web application HTTP request-response cycle.
+- A task queue's input is a unit of work called a task. Dedicated worker processes constantly monitor task queue for new work to perform.
+- Celery is written in Python, but the protocol can be implemented in any language. In addition to Python, there's node-celery and node-celery-ts for Node.js and a PHP client.
+
+----------------------------------------
+Why to use Celery?
+
+- Third Party API Calls.
+- For High CPU intensive tasks.
+- Periodic/Scheduled Tasks.
+- For improving the user experience.
+----------------------------------------
+Celery requires a "message transport" to send and receive messages.
+
+1. Supported brokers - RabbitMQ, Redis, AmazonSQS
+
+2. Result Stores - AMQP, Redis, Memcached, Django ORM, Elasticsearch, MongoDB, Amazon S3, File system
+
+3. Serialization - 
+	- pickle, json, yaml, msgpack.
+	- zlib, bzip2 compression.
+	- Cryptographic message signing.
+
+-------------------------------------------
+Different Modules To Use
+Celery - 
+Django Celery Beat - Periodic task/ schedular task send to celery worker
+Django Celery Results - To store all the data in Django database
+
+
+
+
+'setting.py'
+
+
+# CELERY SETTINGS
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379' or 'django-db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+
+# CELERY BEAT
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+Project_File > 'celery.py'
+------------
+from __future__ import absolute_import, unicode_literals
+import os
+
+from celery import Celery
+from django.conf import settings
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_project_name.settings')
+
+app = Celery('django_project_name')
+app.conf.enable_utc = False
+
+app.conf.update(timezone = 'Asia/Kolkata')
+
+app.config_from_object(settings, namespace = 'CELERY')
+
+# Celery Beat Settings
+app.conf.beat_schedule = {}
+
+app.autodiscover_tasks()
+
+@app.task(bind = True)
+def debug_task(self):
+	print(f'Request: {self.request!r}')
+
+
+Project_File / any App_File > 'tasks.py'
+---------------------------
+from celery import shared_task
+
+@shared_task(bind=True)
+def test_func(self):
+	# operations
+	return "Done"
+
+
+'views.py'
+
+from .tasks import test_func
+
+def test(request):
+	test_func.delay()
+	return HttpResponse("Done")
+
+-----------------------------------------

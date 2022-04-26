@@ -1,0 +1,68 @@
+Django Cache
+
+- Database Caching
+- File System Caching
+- Local Memory Caching
+
+How to implement Cashing
+
+> The per-site cache- Once the cache is setup, the simplest way to use caching is to cache your entire site.
+> The per-view cache - A more granular way to use the caching framework is by caching the output of individual views.
+
+1. Per-site cache
+
+# Order should be same
+MIDDLEWARE = [
+	'django.middleware.cache.UpdateCacheMiddleware',		--> Add
+	'django.middleware.common.CommonMiddleware',			--> Already Exists
+	'django.middleware.cache.fetchFromCacheMiddleware',		--> Add
+]
+
+Variables
+CACHE_MIDDLEWARE_ALIAS - The cache alias to use for storage.
+CACHE_MIDDLEWARE_SECONDS - The number of seconds each page should be cached.
+CACHE_MIDDLEWARE_KEY_PREFIX - If the cache is shared across the multiple sites using the same Django installation,
+set this to the name of the site
+
+------------------------------------
+Database Caching
+
+Django can store its cached data in your database. This works best if you've got a fast, well-indexed database server.
+
+CACHES = {
+	'default':{
+		'BACKEND':'django.core.cache.backends.db.DatabaseCache',
+		'LOCATION':'my_cache_table',
+		# The name of the database table. This name can be whatever you want, as long as it's valid table that's not already being used in your database.
+	}
+}
+
+Before using the database cache, you must create the cache table with this command.
+python manage.py createcachetable
+
+Cache Arguments
+
+
+
+Low-Level Cache Api
+--------------------
+from django.core.cache import cache 
+
+cache.set(key, value, timeout=DEFAULT_TIMEOUT, version=None) - This method is used to set cache.
+
+key - It should be str.
+value - It can be any pickleable Python object.
+timeout - It is number of seconds the value should be stored in the cache. Timeout of None will cache the value forever. A time od 0 won't cache the value.
+version - It is an int. You can set cache with same key but different version.
+
+cache.set(key, default = None, version = None) - This method is used to get cache. If the key doesn't exists in the cache, it returns None.
+
+default - This specifies which to return if the object doesn't exist in the cache.
+
+cache.add(key, value, timeout=DEFAULT_TIMEOUT, version=None)
+
+cache.get_or_set(key, value, timeout=DEFAULT_TIMEOUT, version=None)
+
+cache.set_many(dict, timeout)
+
+cache.get_many(keys, version = None)

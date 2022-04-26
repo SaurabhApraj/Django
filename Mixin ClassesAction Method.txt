@@ -1,0 +1,7 @@
+Mixin Classes			Action Method
+
+ListModelMixin			list()
+CreateModelMixin		create()
+RetriveModelMixin		retrive()
+UpdateModelMixin		update()
+DestroyModelMixin		destroy()

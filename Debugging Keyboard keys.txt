@@ -1,0 +1,7 @@
+Debugging Keyboard keys
+F9 - To set Breakpoint
+F5 - To run the application upto this point
+F10 - To Execute one statement at a time
+F11 - To step into that function
+shift+F5 - To stop the debugger
+shift+F11 - To step out of the function

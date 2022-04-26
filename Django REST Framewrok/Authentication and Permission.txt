@@ -1,0 +1,80 @@
+Authentication and Permission
+-----------------------------------
+- BasicAuthentication
+- SessionAuthentication
+- TokenAuthentication
+- RemoteUserAuthentication
+- Custom authentication
+
+
+Basic Authentication
+
+Permission Classes
+-----------------------
+- AllowAny
+- IsAuthenticated
+- IsAdminUser
+- IsAuthenticatedOrReadOnly
+- DjangoModelPermissions
+- DjangoModelPermissionsOrAnonReadOnly
+- DjangoObjectPermissions
+
+
+
+Sample Code
+--------------
+from rest_framework import viewsets
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+class StudentModelViewSet(viewsets.ModelViewSet):
+	queryset = Student.objects.all()
+	serializer_class = StudentSerializer
+	authentication_classes = [BasicAuthentication]
+	permission_classes = [IsAuthenticated]
+
+
+Globally Authenticate > settings.py
+----------------------
+REST_FRAMEWORK = {
+	'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authentication.BasicAuthentication'],
+	'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.IsAuthenticated']
+}
+
+from rest_framework import viewsets
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated,AllowAny
+
+class StudentModelViewSet(viewsets.ModelViewSet):
+	queryset = Student.objects.all()
+	serializer_class = StudentSerializer
+
+class StudentModelViewSet(viewsets.ModelViewSet):
+	queryset = Student.objects.all()
+	serializer_class = StudentSerializer
+	authentication_classes = [BasicAuthentication]
+	permission_classes = [AllowAny]
+
+class StudentModelViewSet(viewsets.ModelViewSet):
+	queryset = Student.objects.all()
+	serializer_class = StudentSerializer
+
+
+
+SessionAuthentication
+--------------------------
+from rest_framework.authentication import SessionAuthentication
+
+class StudentModelViewSet(viewsets.ModelViewSet):
+	queryset = Student.objects.all()
+	serializer_class = StudentSerializer
+	authentication_classes = [SessionAuthentication]
+
+
+To get login/logout in drf
+---------------------------
+urlpatterns = [
+	...
+	path('auth/', include('rest_framework.urls', namespace='rest_framework'))
+]
+

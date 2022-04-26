@@ -1,0 +1,152 @@
+ORM Queries
+
+# To display all the records
+post = Student.objects.all()
+
+
+OR query ( | )
+post = Student.objects.filter(firstname__startswith = 'saurabh') | Student.objects.filter(firstname__startswith = 'shubham')
+
+	from django.db.models import Q
+	
+	Q Objects
+	post = Student.objects.filter(
+		Q(firstname__startswith = 'saurabh') |
+		Q(firstname__startswith = 'shubham') | 
+		Q(firstname__startswith = 'deepak')
+		)
+
+		NOT ( ~ )
+			post = Student.objects.filter(
+				Q(firstname__startswith = 'saurabh') |
+				~Q(firstname__startswith = 'shubham') | 
+				Q(firstname__startswith = 'deepak')
+				)
+
+
+AND query ( & )
+post = Student.objects.filter(firstname__startswith = 'saurabh') & Student.objects.filter(classroom = 'TYMCA')
+	
+	Q Objects
+	post = Student.objects.filter(
+		Q(firstname__startswith = 'saurabh') & 
+		Q(classroom = 'TYMCA')
+		)
+
+
+UNION query
+post = Student.objects.all().values_list("firstname").union(Teacher.objects.all().values_list("firstname"))
+post = Student.objects.all().values("firstname").union(Teacher.objects.all().values("firstname")) -- Return dictionary
+
+
+NOT query
+- gt
+- gte
+- lt
+- lte
+post = Student.objects.exclude(age__gt = 20)
+post = Student.objects.exclude(age__gt = 20) & Student.objects.exclude(firstname__startswith = 'saurabh')
+
+	Q Objects
+	post = Student.objects.filter(
+		~Q(age__gt = 20) & 
+		~Q(firstname__startswith = 'deepak')
+		)
+
+
+Individual Fields
+post = Student.objects.filter(classroom = 1).only('firstname', 'age')
+
+
+RAW SQL Query
+post = Student.objects.raw("SELECT * FROM student_student WHERE age = 21")
+	
+	Print in console
+	for i in Student.objects.raw("SELECT * FROM student_student"):
+		print(i)
+
+	Limiting QuerySets
+	post = Student.objects.all()[:5] --Return first 5 objects
+
+	post = Student.objects.all()[5:10] --Return 6th through 10th objects(OFFSET 5 LIMIT 5)
+
+
+Custom SQL Directly
+Step 1: django.db.connection
+Step 2: connection.cursor()
+Step 3: cursor.execute(SQL)
+Step 4: cursor.fetchone() or cursor.fetchall()
+
+	cursor.connection.cursor()
+	cursor.execute("SELECT count(*) FROM student_student")
+	a = cursor.fetchone()
+	print(a) --will return a list of values
+
+	cursor.execute("SELECT * FROM student_student")
+	b = cursor.fetchall()
+	print(b) --will return a list of values
+
+	Django Documentation way(Return - object or dictionary)
+	def dictfetchall(cursor):
+		"Return all rows from cursor as a dict"
+		columns = [col[0] for col in cursor.discription]
+		return [
+			dict(zip(columns, row))
+			for row in cursor.fetchall()
+		]
+
+	cursor.execute("SELECT * FROM student_student")
+	c = dictfetchall(cursor)
+	print(c) --will return a dictionary
+
+
+exact
+iexact
+contains
+icontains
+in
+gt
+gte
+lt
+lte
+startswith
+istartswith
+endswith
+iendswith
+range
+year
+month
+day
+week_day
+isnull
+search
+regex
+iregex
+
+
+Model Inheritance
+
+- Abstract models
+- Multi-table model inheritance
+- Proxy models
+
+class BaseItem(model.Model):
+	title = models.CharField(max_length=20)
+	created = models.DateTimeFields(auto_now_add=True)
+	updated = models.DateTimeFields(auto_now=True)
+
+	class Meta:
+		abstract = True
+		ordering = ['title']
+
+class ItemA(BaseItem):
+	content = models.TextFields()
+
+	class Meta(BaseItem.Meta):
+		ordering = ['-created']
+
+class ItemB(BaseItem):
+	file = models.FileFields(upload_to = 'files')
+
+class ItemC(BaseItem):
+	file = models.FileFields(upload_to = 'images')

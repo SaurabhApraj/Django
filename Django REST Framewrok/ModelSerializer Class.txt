@@ -1,0 +1,48 @@
+ModelSerializer Class
+
+The ModelSerializer class provides a shortcut that lets you automatically create a Serializer class with fields that corresponds to the Model fields.
+
+The ModelSerializer class is the same as a regular Serializer class, expect that:
+1.It will automatically generate a set of fields for you, based on the model.
+2.It will automatically generates validators for the serializer, such as unique_together validators.
+3.It includes simple default implementations of create() and update().
+
+Create ModelSerializer Class
+
+'serializers.py'
+
+from rest_framework import serializers
+
+class StudentSerializer(serializer.ModelSerializer):
+	# name = serializers.CharField(read_only = True)
+	 class Meta:
+	 	model = Student
+	 	fields = ['id', 'name', 'roll', 'city']
+
+	 	OR
+
+	 	fields = '__all__' # display all fields
+
+	 	OR
+
+	 	exclude = ['roll'] # instead of roll display all fields
+
+	 	Read Only # This will not update the values
+	 	---------
+	 	# read_only_fields = ['name', 'roll']
+	 	extra_kwargs = {'name': {'read_only': True}}
+
+
+ModelSerializer Validation
+---------------------------
+from rest_framework import serializers
+
+class StudentSerializer(serializer.ModelSerializer):
+	 class Meta:
+	 	model = Student
+	 	fields = ['id', 'name', 'roll', 'city']
+
+	 def validate_roll(self, value):
+	 	if value >= 200:
+	 		raise serializers.ValidationError('Seat Full')
+	 	return 

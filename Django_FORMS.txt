@@ -1,0 +1,70 @@
+FORMS
+https://www.javatpoint.com/django-modelforms
+
+{{ form.as_table }} will render them as table cells wrapped in <tr> tags
+{{ form.as_p }} will render them wrapped in <p> tags
+{{ form.as_ul }} will render them wrapped in <li> tags
+
+/*  FORM Validation  */
+
+def emp(request):
+    if request.method == "POST":
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            try:
+                return redirect('/')
+            except:
+                pass
+    else:
+        form = EmployeeForm()
+    return render(request,'index.html',{'form':form})
+
+
+Form API
+------------
+'forms.py'
+
+from django.core import validators
+from django import forms
+
+class StudentRegistration(forms.From):
+    name = forms.CharField()
+    email = forms.EmailField()
+    password = forms.CharField(width = forms.PasswordInput)
+
+'models.py'
+form django.db import models
+class User(models.Model):
+    name = models.CharField(max_length = 10)
+    email = model.EmailField(max_length = 10)
+    password = model.CharField(max_length = 20) 
+
+'views.py'
+def showdata(request):
+    if request.method == "POST":
+        fm = StudentRegistration(request.POST)
+        if fm.is_valid():
+            nm = fm.cleaned_data['name']
+            em = fm.cleaned_data['email']
+            pw = fm.cleaned_data['password']
+            reg = User(name = nm, email = em, password = pw)
+            reg.save()
+
+'templatesfile.html'
+<form action = "" method = "POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type = "submit" value = "Submit">
+</form>
+
+Model Form
+--------------
+'forms.py'
+from django.core import validators
+from django import forms
+from .models import User
+class StudentRegistration(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'password', 'email']
+

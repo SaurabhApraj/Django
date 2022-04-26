@@ -1,0 +1,52 @@
+Multiple Database Setup
+
+Author.objects.using('other').all()
+
+settings.py
+DATABASES = {
+	'default': {},
+	'users_db': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': BASE_DIR / 'users.db.sqlite3',
+	},
+	'school_db': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': 'school',
+		'USER': 'root',
+		'PASSWORD': os.environ.get('db_password'),
+		'POST': 8080
+	},
+	'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "demo",
+        'USER': "postgres",
+        'PASSWORD': 'superuser',
+        'HOST': "localhost",
+        'PORT': 5432,
+    }
+}
+.
+.
+.
+STATIC_URL = '/static'
+
+DATABASE_ROUTERS = ['routers.db_routers.AuthRouter','routers.db_routers.SchoolRouter']
+
+create a new folders 'routers' > and create new file 'db_routers.py'
+
+db_routers.py
+class AuthRouter:
+	route_app_labels = {'auth', 'contenttypes', 'sessions', 'admin'}
+
+	def db_for_read(self, model, **hints):
+		if model._meta.app_label in self.route_app_labels:
+			return 'users_db'
+		return None
+
+	def db_for_write(self, model, **hints):
+		if model._meta.app_label in self.route_app_labels:
+			return 'users_db'
+		return None
+
+python manage.py migrate --database=users_db
+python manage.py createsuperuser --database=users_db

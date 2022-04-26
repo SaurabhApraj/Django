@@ -1,0 +1,11 @@
+System Design
+
+Topics
+
+	Distributed systems intro
+	Load balancing
+	Performance metrics for distributed systems
+	interview style example
+	load balancing
+	caching
+	database scaling and design

@@ -1,0 +1,79 @@
+Django REST Validation
+
+- Field Level Validation
+- Object Level Validation
+- Validators
+
+Priority of validation
+Validators > Field Level validation > Object Level validation
+
+
+Field Level Validation
+-------------------------
+
+We can specify custom field-level validation by adding
+'validate_fieldName' method to your Serializer subclass
+
+These are similar to the 'clean_fieldName' method on Django forms.
+
+validate_fieldName method should return the validated value or raise a
+Serializers.ValidationError
+
+'serializers.py'
+Eg-
+from rest_framework import serializers
+
+class StudentSerializer(serializers.Serializer):
+	name = serializers.CharField(max_length = 100)
+	roll = serializers.IntegerField()
+	city = serializers.CharField(max_length = 100)
+
+	def validate_roll(self, value):
+		if value >= 200:
+			raise serializers.ValidationError('Seat Full')
+		return value
+
+
+Object Level Validation
+-------------------------
+
+When we need to do validation that requires access to multiple fields we do object level validation by adding a method called 'validate()' to Serializer subclass.
+
+'serializers.py'
+Eg-
+from rest_framework import serializers
+
+class StudentSerializer(serializers.Serializer):
+	name = serializers.CharField(max_length = 100)
+	roll = serializers.IntegerField()
+	city = serializers.CharField(max_length = 100)
+
+	def validate(self, data):
+		nm = data.get('name')
+		ct = data.get('city')
+
+		if (nm.lower() == 'rohit' and ct.lower() != 'ranchi'):
+			raise serializers.ValidationError('City must br Ranchi')
+		return data
+
+
+Validators
+------------
+
+Most of the time you're dealing with validation in REST framework 
+you'll simple be relying on the default field validation, or writing explicit validation methods on serializer or field classes.
+
+However, sometimes you'll want to place your validation logic into reusable components, so that it can easily be reused throughout your codebase. This can be achieved by using validator functions and validator classes.
+
+'serializers.py'
+Eg-
+from rest_framework import serializers
+
+def starts_with_r(value):
+	if value[0].lower() != 'r':
+		raise serializers.ValidationError('Name should start with R')
+
+class StudentSerializer(serializers.Serializer):
+	name = serializers.CharField(max_length = 100, validators = [starts_with_r])
+	roll = serializers.IntegerField()
+	city = serializers.CharField(max_length = 100)

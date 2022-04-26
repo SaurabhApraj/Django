@@ -1,0 +1,11 @@
+Django REST Authentication
+
+Basic Authentication
+Session Authentication
+Token Authentication
+Django Rest Framework OAuth
+JWT Authentication
+Remote User Authentication
+Custom Authentication
+Djoser Library for Authentication
+

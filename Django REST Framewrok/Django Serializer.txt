@@ -1,0 +1,55 @@
+Serializer
+
+Python JSON
+
+dumps(data) - This is used to convert python object into json string.
+loads(data) - This is used to parse json string.
+
+import json
+
+python_data = {'name': 'Saurabh', 'roll': 101}
+json_data = json.dumps(python_data)
+print(json_data)
+{"name": "Saurabh", "roll": 101}
+
+json_data = {"name": "Saurabh", "roll": 101}
+parsed_data = json.loads(json_data)
+print(parsed_data)
+{'name': 'Saurabh', 'roll': 101}
+
+
+A serializer class is very similar to Django Form and ModelForm class
+
+How to create serializer class
+- Create a seperate serializers.py file to write all serializers
+
+from rest_framework import serializers
+
+class StudentSerializer(serializers.Serializer):
+	name = serializers.CharField(max_length=100)
+	roll = serializer.IntegerField()
+	city = serializers.CharField(max_length=100)
+
+
+
+Model
+
++-----------------------------+
+|ID | NAME    | ROLL |  CITY  |
++-----------------------------+
+| 1 | Saurabh | 101  | Mumbai | --> Model Object 1
+| 2 | Shubham | 102  | Pune   | --> Model Object 2
+| 3 | Deepak  | 103  | Mumbai | --> Model Object 3
++-----------------------------+
+
+Complex DataType ---> Python Native DataType ---> Json Data
+
+
+JSON Renderer
+This is used to render Serialized data into JSON which is understandable by FrontEnd.
+
+Importing JSONRenderer
+from rest_framework.renderers import JSONRenderer
+
+Render the Data into JSON
+json_data = JSONRenderer().render(serializer.data)

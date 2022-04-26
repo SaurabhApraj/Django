@@ -1,0 +1,58 @@
+class RequestLogMiddleware():
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.start_time = time.time()
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        self.start_time = time.time()
+        return response
+
+    def process_template_response(self, request, response):
+        request_data = request
+        request_type = request.META.get('HTTP_ACCEPT', request.META.get(
+            'CONTENT_TYPE', 'application/json'))
+        skipUrls = [
+            "/api/v1/notifications/count"
+        ]    
+        data = {
+            "user_id": request.user.pk,
+            "request_method": request.method,
+            "request_path": request.get_full_path(),
+            "response_status": response.status_code,
+            "remote_address": request.META['REMOTE_ADDR'],
+            "server_hostname": socket.gethostname(),
+            "request_body": request_data.POST,
+            "run_time": time.time() - self.start_time
+        }
+        #Not Adding Request Logs(notification count API)
+        if(request.get_full_path() not in skipUrls):
+            save_log(data)
+        return response
+
+
+----------------------------------------------------------
+from django.db import transaction
+
+def home(request):
+if request.method=='POST':
+    try:
+        user_one = request.POST.get('user_one')
+        user_two = request.POST.get('user_two')
+        amount = request.POST.get('amount')
+
+        with transaction.atomic():
+            user_one_obj = Payments.objects.get(user = user_one)
+            user_one_obj.amount -= int(amount)
+            user_one_obj.save()
+            
+            user_two_obj = Payments.objects.get(user = user_two)
+            user_two_obj.amount += int(amount)
+            user_two_obj.save()
+
+            message.success(request, 'Your amount is transfered')
+    
+    except Exception as e:
+        print(e)
+        message.success(request,'Something went wrong') 

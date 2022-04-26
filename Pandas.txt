@@ -1,0 +1,168 @@
+Pandas
+
+Excel -> Pandas
+
+Worksheet - Dataframe
+Column - Series
+Row heading - Index
+Row - Row
+Empty cell - NaN (Not a Number)
+
+import pandas as pd
+import numpy as np
+
+# creating an array
+data = np.array([[1, 4], [2, 5], [3, 6]])
+
+# creating a dataframe
+pd.DataFrame(data)
+
+pd.DataFrame(data, index=['row1', 'row2', 'row3'], columns=['col1','col2'])
+
+# creating a dataframe from dictionary
+states = ['California', 'Texas', 'Florida', 'New York']
+populations = [39613493, 29730311, 21944577, 19299981]
+
+dict_states = {'States': states, 'Population': population}
+df_population = pd.DataFrame(dict_states)
+
+
+# Creating a DataFrame from a CSV file
+df_exams = pd.read_csv('studentPerformance.csv')
+
+df_exams.head() # To display first 5 rows in a dataframe
+df_exams # To display all the rows
+df_exams.tail() # To display last 5 rows in a dataframe
+
+df_exams.head(10) # To display first 10 rows in a dataframe
+df_exams.tail(10) # To display last 10 rows in a dataframe
+
+
+# Getting access to the shape attribute
+df_exams.shape
+
+# display n rows
+pd.set_option('display.max_rows', 1000)
+
+
+Attributes, Methods and Functions
+-----------------------------------
+Attributes
+
+# Getting access to the shape attribute
+df_exams.shape
+
+# Getting access to the index attribute
+df_exams.index
+
+# Getting access to the column attribute
+df_exams.columns
+
+# data types of each column
+df_exams.dtypes
+
+Methods
+
+# showing the first 5 columns
+df_exams.head()
+
+# showing the info of the dataframe
+df_exams.info()
+
+# describing basic statistics of the dataframe
+df_exams.describe()
+
+Functions
+
+# obtaining the length of the dataframe (number of rows)
+len(df_exams)
+
+# obtaining the height index of the dataframe
+max(df_exams.index)
+
+# obtaining the lowest index of the dataframe
+min(df_exams.index)
+
+# obtaining the data type
+type(df_exams)
+
+# rounding the values of the dataset
+round(df_exams, 2)
+
+
+-------------------------------------------------------
+Selecting One Column
+
+import pandas as pd
+df_exams = pd.read_csv('StudentsPerformance.csv')
+df_exams.head()
+
+Syntax 1
+# select a column with [] (preferred way to select a column)
+df_exams['gender']
+
+# check out the data type of a column
+type(df_exams['gender'])
+
+# series: attributes and methods
+df_exams['gender'].index
+df_exams['gender'].head()
+
+
+Syntax 2
+# select a column with .
+df_exams.gender
+
+# select a column with . (pitfalls)
+df_exams.math score
+-> Invalid syntax # we need to add ' _ ' - 'math_score'
+
+# select the same column using []
+df_exams['math score']
+
+
+-------------------------------------------------------
+Selecting Two or more Columns
+
+import pandas as pd
+df_exams = pd.read_csv('StudentsPerformance.csv')
+df_exams.head()
+
+# select 2 columns using [[]]
+df_exams[['gender', 'math score']]
+
+# check out the data type of the selection
+type(df_exams[['gender', 'math score']])
+-> pandas.core.frame.DataFrame
+
+if we use 2 square brackets [[]]
+	it will return DataFrame
+if we use 1 square bracket []
+	it will return Series
+
+# select 2 or more columns using [[]]
+df_exams[['gender', 'writing score', 'math score', 'reading score']]
+
+
+-------------------------------------------------------
+Add New Column to a DataFrame (Simple Assignment)
+
+import pandas as pd
+df_exams = pd.read_csv('StudentsPerformance.csv')
+df_exams.head()
+
+# adding new column to dataframe
+df_exams['language score'] = 70
+
+	- Adding a new column with an array
+# import numpy
+import numpy as np
+
+# create an array of 1000 elements
+language_score = np.arange(0, 1000)
+
+# adding a new column to dataframe with an array
+df_exams['language score'] = language_score
+
+# create random integer numbers between 1 and 100
+np.random.randint(1, 100, size=1000)
