@@ -1,0 +1,90 @@
+Postgres
+
+commands:
+select version(); -> To check the version of the postgres
+\l 				  -> To display list of databases
+create database sql_demo; -> To create new database
+\c sql_demo 	  -> To connect with database
+\d movies		  -> To display description of the table
+
+
+
+
+
+
+queries:
+select 5*3;
+select 5+3+6;
+select 5(3+4);
+
+create table movies(movie_id int, movie_name varchar(20), movie_genre varchar(20), imdb_ratings real);
+
+select * from movies;
+
+
+drop table movies;
+
+
+insert into movies(movie_id, movie_name, movie_genre, imdb_ratings) values(101, 'shark tank', 'action', 9.5),
+(102, 'cars', 'comedy', 4.8),
+(103, 'planes', 'action', 7.7);
+
+
+update movies set movie_genre = 'action' where movie_id = 102;
+
+
+delete from movies where movies_id = 102;
+
+select * from movies where imdb_ratings > 5;
+
+select * from movies where imdb_ratings between 4.8 and 9.5;
+
+select movie_name, movie_genre from movies where imdb_ratings < 9.0;
+
+
+select * from movies where imdb_ratings in (8.7, 9.0);
+
+select distinct address from employees;
+
+select * from employees where email is null;
+
+select * from employees order by salary; # ascending by default
+
+select * from employees order by salary desc;
+
+
+alter table employees rename column address to country;
+
+select * from employees where country = 'france' and salary < 80000;
+
+select * from employees where country = 'france' or department = 'sales;
+
+select * from employees order by salary desc limit 5;
+
+select * from employees order by salary desc limit 5 offset 3;
+
+select * from employees order by salary desc fetch first 3 row only;
+
+select * from employees order by salary desc offset 3 rows fetch first 5 row only;
+
+
+select name, email from employees where name like 'A%';
+
+select name, email from employees where name like '%a';
+
+select name, email from employees where name like '%ish%';
+
+select name, email from employees where name like '_a%'; # second word as 'a'
+
+select sum(salary) from employees;
+select sum(salary) as total_salary from employees;
+select avg(salary) as avg_salary from employees;
+select min(salary) as min_salary from employees;
+select max(salary) as max_salary from employees;
+
+
+select count(distinct department) as total_dept from employees;
+
+select country, avg(salary) as avg_salary from employees group by country;
+
+select country, avg(salary) as avg_salary from employees group by country order by avg_salary desc;
